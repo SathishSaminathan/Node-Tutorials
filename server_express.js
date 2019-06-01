@@ -1,14 +1,38 @@
 const express = require("express");
 const app = express();
-// const querystring = require("querystring");
+const bodyParser = require("body-parser");
+const fs = require("fs");
+
+const jsonParser = bodyParser.json();
+
+app.use("/css", express.static(__dirname + "/public/css"));
+app.use("/", (req, res, next) => {
+  console.log(`Somebody tried for the api.... of url ${req.url}`);
+  res.cookie("cookieName", "cookieValue");
+
+  next();
+});
 
 app.get("/", (req, res) => {
   res.send(`
     <html>
-        <body style="background:red">
+      <head>
+        <link type="text/css" rel="stylesheet" href="/css/styles.css"/>
+      </head>
+        <body>
             Hello sachu!!!
         </body>
     </html>`);
+});
+
+app.get("/user_data", (req, res) => {
+  let HTML = fs.readFileSync(`${__dirname}/postJson.html`);
+  res.send(`${HTML}`);
+});
+
+app.post("/post_userdata", jsonParser, (req, res) => {
+  console.log(req.body);
+  res.sendStatus(200);
 });
 
 app.get("/api/user", (req, res) => {
